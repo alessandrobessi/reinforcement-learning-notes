@@ -11,6 +11,20 @@ CAPITAL = 100
 ACTION_SPACE = CAPITAL + 1
 
 
+def show_optimal_policy(p: np.array) -> None:
+    plt.bar(range(CAPITAL), p, align='center', alpha=0.5)
+    plt.xlabel('Capital')
+    plt.ylabel('Final Policy (stake)')
+    plt.show()
+
+
+def show_value_estimates(v) -> None:
+    plt.plot(range(CAPITAL), v[:CAPITAL])
+    plt.xlabel('Capital')
+    plt.ylabel('Value Estimates')
+    plt.show()
+
+
 def one_step_lookahead(p: float,
                        gamma: float,
                        s: int,
@@ -25,7 +39,7 @@ def one_step_lookahead(p: float,
 
 
 def value_iteration(p: float,
-                    theta: float = 1e-32,
+                    theta: float = 1e-12,
                     gamma: float = 1.0) -> Tuple[np.array, np.array]:
     rewards = np.zeros(ACTION_SPACE)
     rewards[CAPITAL] = 1
@@ -63,18 +77,5 @@ if __name__ == '__main__':
     print("Optimized Value Function")
     print(V)
 
-    x = range(100)
-    y = V[:100]
-
-    plt.plot(x, y)
-    plt.xlabel('Capital')
-    plt.ylabel('Value Estimates')
-    plt.show()
-
-    x = range(100)
-    y = policy
-
-    plt.bar(x, y, align='center', alpha=0.5)
-    plt.xlabel('Capital')
-    plt.ylabel('Final Policy (stake)')
-    plt.show()
+    show_optimal_policy(policy)
+    show_value_estimates(V)
