@@ -31,7 +31,6 @@ def value_iteration(p: float,
     rewards[CAPITAL] = 1
 
     V = np.zeros(ACTION_SPACE)
-    policy = np.zeros(CAPITAL)
 
     while True:
         delta = 0
