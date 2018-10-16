@@ -39,7 +39,7 @@ def one_step_lookahead(p: float,
 
 
 def value_iteration(p: float,
-                    theta: float = 1e-12,
+                    theta: float = 1e-300,
                     gamma: float = 1.0) -> Tuple[np.array, np.array]:
     rewards = np.zeros(ACTION_SPACE)
     rewards[CAPITAL] = 1
@@ -61,6 +61,8 @@ def value_iteration(p: float,
     for s in range(1, CAPITAL):
         A = one_step_lookahead(p, gamma, s, V, rewards)
         policy[s] = np.argmax(A)
+
+    print(policy)
 
     return policy, V
 
