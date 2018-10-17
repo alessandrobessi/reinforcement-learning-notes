@@ -4,7 +4,7 @@ from typing import Tuple
 import matplotlib.pyplot as plt
 import numpy as np
 
-with open(os.path.join(os.getcwd(), 'gambler.md'), encoding='utf-8') as f:
+with open(os.path.join(os.getcwd(), 'gambler-problem.md'), encoding='utf-8') as f:
     description = f.read()
 
 CAPITAL = 100
@@ -72,11 +72,11 @@ if __name__ == '__main__':
 
     policy, V = value_iteration(0.4)
 
-    print("Optimized Policy")
+    print("Optimal Policy")
     print(policy)
     print()
 
-    print("Optimized Value Function")
+    print("OPtimal Value Function")
     print(V)
 
     show_optimal_policy(policy)
