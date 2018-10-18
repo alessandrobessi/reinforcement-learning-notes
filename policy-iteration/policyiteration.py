@@ -4,7 +4,7 @@ import numpy as np
 
 from envs.gridworld import GridworldEnv
 
-PolicyEvalArgs = Callable[[np.array, GridworldEnv], np.array]
+PolicyEvalArgs = Callable[[np.array, GridworldEnv, float, float], np.array]
 
 
 def policy_eval(policy: np.array,
