@@ -26,7 +26,7 @@ def plot_surface(x: np.array, y: np.array, z: np.array, title: str) -> None:
 
 
 def plot_value_function(v: Dict[Tuple, float],
-                        title: str = "Value Function") -> None:
+                        title: str = 'Value Function') -> None:
     min_x = min(k[0] for k in v.keys())
     max_x = max(k[0] for k in v.keys())
     min_y = min(k[1] for k in v.keys())
@@ -40,8 +40,8 @@ def plot_value_function(v: Dict[Tuple, float],
     z_no_ace = np.apply_along_axis(lambda _: v[(_[0], _[1], False)], 2, np.dstack([x, y]))
     z_ace = np.apply_along_axis(lambda _: v[(_[0], _[1], True)], 2, np.dstack([x, y]))
 
-    plot_surface(x, y, z_no_ace, "{} (No Usable Ace)".format(title))
-    plot_surface(x, y, z_ace, "{} (Usable Ace)".format(title))
+    plot_surface(x, y, z_no_ace, '{} (No Usable Ace)'.format(title))
+    plot_surface(x, y, z_ace, '{} (Usable Ace)'.format(title))
 
 
 def mc_prediction(policy: np.array,
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     env = BlackjackEnv()
 
     V_1M = mc_prediction(dumb_policy, env, num_episodes=1e6)
-    plot_value_function(V_1M, title="Value Function after 1M Steps")
+    plot_value_function(V_1M, title='Value Function after 1M Steps')
