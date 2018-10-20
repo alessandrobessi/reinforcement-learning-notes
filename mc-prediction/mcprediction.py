@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Dict, List, Tuple, Union
 
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import tqdm
@@ -18,6 +19,8 @@ def plot_surface(x: np.array, y: np.array, z: np.array, title: str) -> None:
     ax.set_zlabel('Value')
     ax.set_title(title)
     ax.view_init(ax.elev, -120)
+    ax.set_yticks(range(1, 11))
+    ax.set_xticks(range(12, 22))
     fig.colorbar(surface)
     plt.show()
 
@@ -62,9 +65,9 @@ def mc_prediction(policy: np.array,
 
         states_in_episode = set([tuple(ep[0]) for ep in episode])
         for state in states_in_episode:
-            first_occurrence_idx = next(i for i, ep in enumerate(episode) if ep[0] == state)
+            first_visit_idx = next(i for i, ep in enumerate(episode) if ep[0] == state)
             g = sum([ep[2] * (discount_factor ** i) for i, ep in
-                     enumerate(episode[first_occurrence_idx:])])
+                     enumerate(episode[first_visit_idx:])])
             rewards_sum[state] += g
             rewards_count[state] += 1.0
             v[state] = rewards_sum[state] / rewards_count[state]
