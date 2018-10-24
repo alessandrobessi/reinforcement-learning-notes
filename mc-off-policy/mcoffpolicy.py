@@ -18,7 +18,7 @@ def create_random_policy(num_actions: int) -> Callable:
 
 
 def create_greedy_policy(Q: Dict) -> Callable:
-    def policy_fn(state):
+    def policy_fn(state: int):
         A = np.zeros_like(Q[state], dtype=float)
         best_action = np.argmax(Q[state])
         A[best_action] = 1.0
