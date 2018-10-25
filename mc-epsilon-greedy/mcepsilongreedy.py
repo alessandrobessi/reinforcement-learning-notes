@@ -1,11 +1,13 @@
-from collections import defaultdict
-from typing import Dict, List, Tuple, Union, Callable
+from collections import defaultdict, namedtuple
+from typing import Dict, Tuple, Callable
 
 import numpy as np
 from tqdm import tqdm
 
 from envs.blackjack import BlackjackEnv
 from viz import viz
+
+Step = namedtuple('Step', ['state', 'action', 'reward'])
 
 
 def make_epsilon_greedy_policy(Q: Dict,
@@ -40,15 +42,15 @@ def mc_control_epsilon_greedy(env: BlackjackEnv,
             probs = policy(state)
             action = np.random.choice(np.arange(len(probs)), p=probs)
             next_state, reward, is_over, _ = env.step(action)
-            episode.append((state, action, reward))
+            episode.append(Step(state, action, reward))
             state = next_state
 
-        sa_in_episode = set([(tuple(ep[0]), ep[1]) for ep in episode])
+        sa_in_episode = set([(tuple(ep.state), ep.action) for ep in episode])
         for state, action in sa_in_episode:
             sa_pair = (state, action)
             first_visit = next(i for i, ep in enumerate(episode)
-                               if ep[0] == state and ep[1] == action)
-            g = sum([ep[2] * (discount_factor ** i) for i, ep in
+                               if ep.state == state and ep.action == action)
+            g = sum([ep.reward * (discount_factor ** i) for i, ep in
                      enumerate(episode[first_visit:])])
             rewards_sum[sa_pair] += g
             rewards_count[sa_pair] += 1.0
