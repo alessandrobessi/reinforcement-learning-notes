@@ -12,7 +12,7 @@ EpisodeStats = namedtuple('Stats', ['length', 'reward'])
 def make_epsilon_greedy_policy(Q: Dict,
                                epsilon: float,
                                num_actions: int) -> Callable[[int], np.array]:
-    def policy_fn(state: int):
+    def policy_fn(state: int) -> np.array:
         A = np.ones(num_actions, dtype=float) * epsilon / num_actions
         best_action = np.argmax(Q[state])
         A[best_action] += (1.0 - epsilon)
