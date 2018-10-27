@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict, namedtuple
 from typing import Dict, Callable, Tuple
 from tqdm import tqdm
-from envs.windygridworld import WindyGridworldEnv
+from envs.cliffwalking import CliffWalkingEnv
 from viz import viz
 
 EpisodeStats = namedtuple('Stats', ['length', 'reward'])
@@ -21,7 +21,7 @@ def make_epsilon_greedy_policy(Q: Dict,
     return policy_fn
 
 
-def q_learning(env: WindyGridworldEnv,
+def q_learning(env: CliffWalkingEnv,
                num_episodes: float,
                discount: float = 1.0,
                alpha: float = 0.5,
@@ -57,7 +57,7 @@ def q_learning(env: WindyGridworldEnv,
 
 
 if __name__ == '__main__':
-    env = WindyGridworldEnv()
+    env = CliffWalkingEnv()
 
     Q, stats = q_learning(env, 1e4)
     viz.plot_episode_stats(stats)

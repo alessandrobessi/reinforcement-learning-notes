@@ -22,7 +22,7 @@ class WindyGridworldEnv(discrete.DiscreteEnv):
     def _calculate_transition_prob(self,
                                    current: Tuple,
                                    delta: List,
-                                   winds: np.array):
+                                   winds: np.array) -> List[Tuple[float, np.array, float, bool]]:
         new_position = np.array(current) + np.array(delta) + np.array([-1, 0]) * winds[
             tuple(current)]
         new_position = self._limit_coordinates(new_position).astype(int)

@@ -21,20 +21,19 @@ class CliffWalkingEnv(discrete.DiscreteEnv):
 
     def _calculate_transition_prob(self,
                                    current: Tuple,
-                                   delta: List) -> Tuple[float, np.array, float, bool]:
+                                   delta: List) -> List[Tuple[float, np.array, float, bool]]:
         new_position = np.array(current) + np.array(delta)
         new_position = self._limit_coordinates(new_position).astype(int)
         new_state = np.ravel_multi_index(tuple(new_position), self.shape)
         reward = -100.0 if self._cliff[tuple(new_position)] else -1.0
         is_done = self._cliff[tuple(new_position)] or (tuple(new_position) == (3, 11))
-        return 1.0, new_state, reward, is_done
+        return [(1.0, new_state, reward, is_done)]
 
     def __init__(self):
         self.shape = (4, 12)
         num_states = int(np.prod(self.shape))
         num_actions = 4
 
-        # Cliff Location
         self._cliff = np.zeros(self.shape, dtype=np.bool)
         self._cliff[3, 1:-1] = True
 
