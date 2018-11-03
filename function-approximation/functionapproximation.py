@@ -16,59 +16,33 @@ EpisodeStats = namedtuple('Stats', ['length', 'reward'])
 class Estimator:
 
     @staticmethod
-    def featurize_state(state):
-        """
-        Returns the featurized representation for a state.
-        """
+    def featurize_state(state: np.ndarray) -> np.ndarray:
         scaled = scaler.transform([state])
         featurized = featurizer.transform(scaled)
         return featurized[0]
 
     def __init__(self):
-        # We create a separate model for each action in the environment's
-        # action space. Alternatively we could somehow encode the action
-        # into the features, but this way it's easier to code up.
         self.models = []
         for _ in range(env.action_space.n):
             model = SGDRegressor(learning_rate='constant', tol=1e-3)
-            # We need to call partial_fit once to initialize the model
-            # or we get a NotFittedError when trying to make a prediction
-            # This is quite hacky.
             model.partial_fit([self.featurize_state(env.reset())], [0])
             self.models.append(model)
 
-    def predict(self, s: int, a: int = None) -> Union[int, np.array]:
-        """
-        Makes value function predictions.
-
-        Args:
-            s: state to make a prediction for
-            a: (Optional) action to make a prediction for
-
-        Returns
-            If an action a is given this returns a single number as the prediction.
-            If no action is given this returns a vector or predictions for all actions
-            in the environment where pred[i] is the prediction for action i.
-
-        """
+    def predict(self, s: np.ndarray, a: int = None) -> Union[int, np.array]:
         features = self.featurize_state(s)
         if not a:
             return np.array([m.predict([features])[0] for m in self.models])
         return self.models[a].predict([features])[0]
 
-    def update(self, s: int, a: int, y: int) -> None:
-        """
-        Updates the estimator parameters for a given state and action towards
-        the target y.
-        """
+    def update(self, s: np.ndarray, a: int, y: int) -> None:
         features = self.featurize_state(s)
         self.models[a].partial_fit([features], [y])
 
 
 def make_epsilon_greedy_policy(estimator: Estimator,
                                epsilon: float,
-                               num_actions: int) -> Callable[[int], np.array]:
-    def policy_fn(state: int) -> np.array:
+                               num_actions: int) -> Callable[[np.ndarray], np.array]:
+    def policy_fn(state: np.ndarray) -> np.array:
         A = np.ones(num_actions, dtype=float) * epsilon / num_actions
         q_values = estimator.predict(state)
         best_action = np.argmax(q_values)
