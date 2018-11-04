@@ -58,71 +58,32 @@ def q_learning(env,
                discount_factor: float = 1.0,
                epsilon: float = 0.1,
                epsilon_decay: float = 1.0) -> EpisodeStats:
-    """
-    Q-Learning algorithm for fff-policy TD control using Function Approximation.
-    Finds the optimal greedy policy while following an epsilon-greedy policy.
-
-    Args:
-        env: OpenAI environment.
-        estimator: Action-Value function estimator
-        num_episodes: Number of episodes to run for.
-        discount_factor: Gamma discount factor.
-        epsilon: Chance the sample a random action. Float betwen 0 and 1.
-        epsilon_decay: Each episode, epsilon is decayed by this factor
-
-    Returns:
-        An EpisodeStats object with two numpy arrays for episode_lengths and episode_rewards.
-    """
-
     stats = EpisodeStats(length=np.zeros(num_episodes), reward=np.zeros(num_episodes))
 
     for i in tqdm(range(num_episodes)):
 
-        # The policy we're following
         policy = make_epsilon_greedy_policy(
             estimator, epsilon * epsilon_decay ** i, env.action_space.n)
 
-        # Print out which episode we're on, useful for debugging.
-        # Also print reward for last episode
-        last_reward = stats.reward[i - 1]
-
-        # Reset the environment and pick the first action
         state = env.reset()
 
-        # Only used for SARSA, not Q-Learning
         next_action = None
 
-        # One step in the environment
         for t in itertools.count():
 
-            # Choose an action to take
-            # If we're using SARSA we already decided in the previous step
             if next_action is None:
                 action_probs = policy(state)
                 action = np.random.choice(np.arange(len(action_probs)), p=action_probs)
             else:
                 action = next_action
 
-            # Take a step
             next_state, reward, done, _ = env.step(action)
 
-            # Update statistics
             stats.reward[i] += reward
             stats.length[i] = t
 
-            # TD Update
             q_values_next = estimator.predict(next_state)
-
-            # Use this code for Q-Learning
-            # Q-Value TD Target
             td_target = reward + discount_factor * np.max(q_values_next)
-
-            # Use this code for SARSA TD Target for on policy-training:
-            # next_action_probs = policy(next_state)
-            # next_action = np.random.choice(np.arange(len(next_action_probs)), p=next_action_probs)
-            # td_target = reward + discount_factor * q_values_next[next_action]
-
-            # Update the function approximator using our target
             estimator.update(state, action, td_target)
 
             if done:
@@ -136,14 +97,10 @@ def q_learning(env,
 if __name__ == '__main__':
     env = gym.envs.make('MountainCar-v0')
 
-    # Feature Preprocessing: Normalize to zero mean and unit variance
-    # We use a few samples from the observation space to do this
     observation_examples = np.array([env.observation_space.sample() for x in range(10000)])
     scaler = StandardScaler()
     scaler.fit(observation_examples)
 
-    # Used to convert a state to a featurizes represenation.
-    # We use RBF kernels with different variances to cover different parts of the space
     num_components = 100
     featurizer = FeatureUnion([
         ('rbf1', RBFSampler(gamma=5.0, n_components=num_components)),
@@ -154,10 +111,6 @@ if __name__ == '__main__':
     featurizer.fit(scaler.transform(observation_examples))
 
     estimator = Estimator()
-
-    # Note: For the Mountain Car we don't actually need an epsilon > 0.0
-    # because our initial estimate for all states is too "optimistic" which leads
-    # to the exploration of all states.
     stats = q_learning(env, estimator, 1000, epsilon=0.0)
 
     viz.plot_cost_to_go_mountain_car(env, estimator)
